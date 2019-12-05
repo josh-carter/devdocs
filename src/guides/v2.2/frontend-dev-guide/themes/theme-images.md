@@ -130,3 +130,49 @@ php <magento install dir>/bin/magento catalog:images:resize
 This command has no arguments or options. A progress indicator displays while the command runs.
 
 The message `Product images resized successfully` displays to confirm the command succeeded.
+
+## Configure variables in view.xml {#view_xml_vars}
+
+The variable properties `vars` are configured for each module individually, defined by `module` name.
+
+```xml
+<vars module="Magento_Catalog">
+    <var name="breakpoints">
+        <var name="mobile">
+            <var name="conditions">
+                <var name="max-width">767px</var>
+            </var>
+            ...
+        </var>
+    </var>
+    ...
+</vars>
+```
+
+Any block that extends [`AbstractBlock`]({{ site.mage2bloburl }}/{{ page.guide_version }}/lib/internal/Magento/Framework/View/Element/AbstractBlock.php), can fetch variable values with the `getVar` method:
+
+```php
+$block->getVar($name, $module = null)
+```
+
+| Parameter | Required | Description |
+| --- | --- | --- |
+| `name` | `Yes` | The first level variable name |
+| `module` | `No` | The module name where the variable is added. If not passed, it will be determined automatically based on the current module. |
+
+Check the following example on getting the breakpoints variable by the [`Gallery`]({{ site.mage2bloburl }}/{{ page.guide_version }}/app/code/Magento/Catalog/Block/Product/View/Gallery.php) block:
+
+```php
+/**
+ * Return breakpoints options
+ *
+ * @return string
+ */
+public function getBreakpoints()
+{
+    return $this->jsonEncoder->encode($this->getVar('breakpoints'));
+}
+```
+
+ {:.bs-callout-info}
+Variables may be used within the scope of modules than the defined one.
